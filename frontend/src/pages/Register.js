@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { Link, useNavigate } from 'react-router-dom';
 
 function Register() {
+  const navigate = useNavigate();
   const [form, setForm] = useState({ name: '', email: '', password: '', role: 'patient' });
 
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
@@ -10,6 +12,7 @@ function Register() {
     e.preventDefault();
     await axios.post('http://localhost:5000/api/users/register', form);
     alert("Registered!");
+    navigate('/login');
   };
 
   return (
@@ -25,6 +28,7 @@ function Register() {
         </select>
         <button className="btn btn-primary">Register</button>
       </form>
+      <p className="mt-3">Already a member? <Link to="/login">Sign in</Link></p>
     </div>
   );
 }

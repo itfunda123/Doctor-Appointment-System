@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { Link, useNavigate } from 'react-router-dom';
 
 function Login() {
+  const navigate = useNavigate();
   const [form, setForm] = useState({ email: '', password: '' });
 
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
@@ -13,6 +15,7 @@ function Login() {
       localStorage.setItem('token', res.data.token);
       localStorage.setItem('user', JSON.stringify(res.data.user));
       alert('Login successful');
+      navigate('/');
     } catch (err) {
       alert('Invalid credentials');
     }
@@ -26,6 +29,7 @@ function Login() {
         <input name="password" type="password" className="form-control my-2" placeholder="Password" onChange={handleChange} />
         <button className="btn btn-primary">Login</button>
       </form>
+      <p className="mt-3">Not yet a member? <Link to="/register">Sign up</Link></p>
     </div>
   );
 }
