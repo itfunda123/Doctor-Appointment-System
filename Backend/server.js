@@ -1,24 +1,17 @@
 const express = require('express');
-const mongoose = require('mongoose');
+const dotenv = require('dotenv');
 const cors = require('cors');
-require('dotenv').config();
+const connectDB = require('./config/db');
+
+dotenv.config();
+connectDB();
 
 const app = express();
-const PORT = process.env.PORT || 5000;
-
 app.use(cors());
 app.use(express.json());
 
-// DB connection
-mongoose.connect(process.env.MONGO_URI)
-    .then(() => console.log('MongoDB connected'))
-    .catch(err => console.log(err));
+app.use('/api/users', require('./routes/userRoutes'));
+app.use('/api/appointments', require('./routes/appointmentRoutes'));
 
-// Sample route
-app.get('/', (req, res) => {
-    res.send('API is running...');
-});
-
-// Routes will go here (e.g., /api/users, /api/appointments)
-
+const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
