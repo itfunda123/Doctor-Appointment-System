@@ -6,11 +6,6 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
-
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
-}
 html, body, #root {
   height: 100%;
   margin: 0;
@@ -24,5 +19,46 @@ html, body, #root {
 
 .content-wrap {
   flex: 1;
+}
+
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+/* CSS for Fade-In Animation */
+.fade-in {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: all 1s ease-out;
+}
+
+.fade-in.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Animation for Hero Section */
+.hero-section {
+  animation: fadeInBg 2s ease-in-out;
+}
+
+@keyframes fadeInBg {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+/* Button Hover Effect */
+.btn-primary {
+  transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+.btn-primary:hover {
+  transform: scale(1.1);
+  background-color: #0056b3;
 }
 

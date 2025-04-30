@@ -13,10 +13,13 @@ function Navbar() {
   return (
     <nav className="navbar navbar-expand navbar-dark bg-dark px-3">
       <Link to="/" className="navbar-brand">DocApp</Link>
-      <div className="navbar-nav">
+
+      {/* Right-aligned nav items */}
+      <div className="navbar-nav ms-auto">
         <Link to="/" className="nav-link">Home</Link>
         <Link to="/register" className="nav-link">Register</Link>
         <Link to="/book" className="nav-link">Book</Link>
+
         {user && (
           <>
             <span className="nav-link disabled">Hello, {user.name}</span>
