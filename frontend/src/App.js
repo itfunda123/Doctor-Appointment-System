@@ -7,6 +7,7 @@ import Register from './pages/Register';
 import Login from './pages/Login';
 import BookAppointment from './pages/BookAppointment';
 import ViewAppointments from './pages/ViewAppointments'; // NEW import
+import DoctorDashboard from './pages/DoctorDashboard'; // NEW import
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/book" element={<BookAppointment />} />
             <Route path="/appointments" element={<ViewAppointments />} /> {/* NEW route */}
+            <Route path="/doctor-dashboard" element={<DoctorDashboard />} /> {/* NEW route */}
           </Routes>
         </div>
         <Footer />

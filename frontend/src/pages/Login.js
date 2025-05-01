@@ -15,7 +15,13 @@ function Login() {
       localStorage.setItem('token', res.data.token);
       localStorage.setItem('user', JSON.stringify(res.data.user));
       alert('Login successful');
-      navigate('/');
+
+      const role = res.data.user.role;
+      if (role === 'doctor') {
+        navigate('/doctor-dashboard');
+      } else {
+        navigate('/');
+      }
     } catch (err) {
       alert('Invalid credentials');
     }
@@ -25,11 +31,24 @@ function Login() {
     <div className="container mt-5">
       <h2>Login</h2>
       <form onSubmit={handleSubmit}>
-        <input name="email" className="form-control my-2" placeholder="Email" onChange={handleChange} />
-        <input name="password" type="password" className="form-control my-2" placeholder="Password" onChange={handleChange} />
+        <input
+          name="email"
+          className="form-control my-2"
+          placeholder="Email"
+          onChange={handleChange}
+        />
+        <input
+          name="password"
+          type="password"
+          className="form-control my-2"
+          placeholder="Password"
+          onChange={handleChange}
+        />
         <button className="btn btn-primary">Login</button>
       </form>
-      <p className="mt-3">Not yet a member? <Link to="/register">Sign up</Link></p>
+      <p className="mt-3">
+        Not yet a member? <Link to="/register">Sign up</Link>
+      </p>
     </div>
   );
 }
