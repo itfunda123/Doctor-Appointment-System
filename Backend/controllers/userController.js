@@ -9,8 +9,8 @@ exports.register = async (req, res) => {
     const existingUser = await User.findOne({ email });
     if (existingUser) return res.status(400).json({ error: 'User already exists' });
 
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const user = new User({ name, email, password: hashedPassword, role });
+    // Let the Mongoose schema handle password hashing
+    const user = new User({ name, email, password, role });
 
     await user.save();
 
