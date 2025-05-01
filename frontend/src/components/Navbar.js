@@ -19,9 +19,9 @@ function Navbar() {
         <Link to="/" className="nav-link">Home</Link>
         <Link to="/register" className="nav-link">Register</Link>
         <Link to="/book" className="nav-link">Book</Link>
-
         {user && (
           <>
+            <Link to="/appointments" className="nav-link">View Appointments</Link>
             <span className="nav-link disabled">Hello, {user.name}</span>
             <button className="btn btn-link nav-link" onClick={handleLogout}>Logout</button>
           </>
