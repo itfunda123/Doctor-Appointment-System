@@ -8,12 +8,13 @@ import Login from './pages/Login';
 import BookAppointment from './pages/BookAppointment';
 import ViewAppointments from './pages/ViewAppointments';
 import DoctorDashboard from './pages/DoctorDashboard';
+import PatientDashboard from './components/PatientDashboard';
 
 function App() {
   return (
     <div className="app-container d-flex flex-column min-vh-100">
       <Router>
-        {/* Show patient Navbar only if NOT on the doctor dashboard route */}
+        {/* Show Navbar only if NOT on the doctor dashboard route */}
         {!window.location.pathname.startsWith('/doctor-dashboard') && <Navbar />}
 
         <div className="content-wrap flex-grow-1">
@@ -24,6 +25,7 @@ function App() {
             <Route path="/book" element={<BookAppointment />} />
             <Route path="/appointments" element={<ViewAppointments />} />
             <Route path="/doctor-dashboard" element={<DoctorDashboard />} />
+            <Route path="/patient-dashboard" element={<PatientDashboard />} /> {/* ✅ NEW */}
           </Routes>
         </div>
 
