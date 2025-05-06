@@ -3,6 +3,6 @@ const { createAppointment, getAppointments } = require('../controllers/appointme
 const router = express.Router();
 
 router.post('/', createAppointment);
-router.get('/', getAppointments);
+router.get('/', getAppointments);  // Fetch all appointments (or add filters here)
 
 module.exports = router;

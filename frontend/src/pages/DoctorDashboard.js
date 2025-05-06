@@ -1,14 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import DoctorNavbar from '../components/DoctorNavbar';
-import { Card } from 'react-bootstrap';
+import { Card, Button } from 'react-bootstrap';
+import { Link } from 'react-router-dom';
 
 function DoctorDashboard() {
   const user = JSON.parse(localStorage.getItem('user'));
   const [appointments, setAppointments] = useState([]);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [availability, setAvailability] = useState({});
-  const [message, setMessage] = useState('');
-  const [sentMessages, setSentMessages] = useState([]);
+  const [messages, setMessages] = useState({});  // Store messages for each patient
 
   useEffect(() => {
     const fetchAppointments = async () => {
@@ -24,45 +22,19 @@ function DoctorDashboard() {
     fetchAppointments();
   }, [user]);
 
-  const handleApprove = async (appointmentId) => {
-    try {
-      await fetch(`/api/appointments/approve/${appointmentId}`, { method: 'POST' });
-      setAppointments((prev) => prev.filter((appt) => appt.id !== appointmentId));
-    } catch (error) {
-      console.error('Error approving appointment:', error);
+  const handleSendMessage = async (patientId, modalId) => {
+    const messageContent = messages[patientId];
+
+    if (!messageContent) {
+      console.error('No message content provided');
+      return;
     }
-  };
 
-  const handleReject = async (appointmentId) => {
-    try {
-      await fetch(`/api/appointments/reject/${appointmentId}`, { method: 'POST' });
-      setAppointments((prev) => prev.filter((appt) => appt.id !== appointmentId));
-    } catch (error) {
-      console.error('Error rejecting appointment:', error);
-    }
-  };
-
-  const handleSearchChange = (e) => {
-    setSearchTerm(e.target.value.toLowerCase());
-  };
-
-  const handleAvailabilityChange = (e) => {
-    setAvailability({
-      ...availability,
-      [e.target.name]: e.target.value,
-    });
-  };
-
-  const handleMessageChange = (e) => {
-    setMessage(e.target.value);
-  };
-
-  const handleSendMessage = async (patientId) => {
     try {
       const newMessage = {
         patientId,
         doctorId: user?.id,
-        content: message,
+        content: messageContent,
         timestamp: new Date(),
       };
 
@@ -73,8 +45,18 @@ function DoctorDashboard() {
       });
 
       if (response.ok) {
-        setSentMessages((prevMessages) => [...prevMessages, newMessage]);
-        setMessage('');
+        // After message is sent, clear the message state for that patient
+        setMessages((prevMessages) => {
+          const updatedMessages = { ...prevMessages };
+          delete updatedMessages[patientId]; // Clear message after sending
+          return updatedMessages;
+        });
+        // Close the modal after sending the message
+        const modal = document.getElementById(modalId);
+        if (modal) {
+          const modalInstance = new window.bootstrap.Modal(modal);
+          modalInstance.hide();
+        }
       } else {
         console.error('Failed to send message');
       }
@@ -88,143 +70,124 @@ function DoctorDashboard() {
       <DoctorNavbar user={user} />
 
       <div className="container mt-4">
-        <h2 className="mb-4 text-center">Welcome Dr. {user?.name}</h2>
+        <h2 className="mb-4">Welcome, Dr. {user?.name}</h2>
 
-        <div className="row mb-4">
-          <div className="col-md-4">
-            <Card className="text-center shadow-sm">
+        {/* Action Cards for managing appointments, messaging, and availability */}
+        <div className="row">
+          <div className="col-md-4 mb-4">
+            <Card className="shadow-sm">
               <Card.Body>
-                <Card.Title>Manage Availability</Card.Title>
-                <form>
-                  <label>From:</label>
-                  <input
-                    type="time"
-                    name="start"
-                    value={availability.start || ''}
-                    onChange={handleAvailabilityChange}
-                    className="form-control mb-2"
-                  />
-                  <label>Until:</label>
-                  <input
-                    type="time"
-                    name="end"
-                    value={availability.end || ''}
-                    onChange={handleAvailabilityChange}
-                    className="form-control mb-2"
-                  />
-                  <button className="btn btn-primary w-100">Save</button>
-                </form>
+                <Card.Title>Manage Appointments</Card.Title>
+                <Card.Text>View, approve, or reject patient appointments.</Card.Text>
+                <Link to="/appointments">
+                  <Button variant="primary" className="w-100">View Appointments</Button>
+                </Link>
               </Card.Body>
             </Card>
           </div>
 
-          <div className="col-md-8">
+          <div className="col-md-4 mb-4">
             <Card className="shadow-sm">
               <Card.Body>
-                <Card.Title>Search Appointments</Card.Title>
-                <input
-                  type="text"
-                  placeholder="Search by patient name..."
-                  onChange={handleSearchChange}
-                  className="form-control"
-                />
+                <Card.Title>Send Messages</Card.Title>
+                <Card.Text>Send messages to your patients about appointments.</Card.Text>
+                <Link to="/messages">
+                  <Button variant="secondary" className="w-100">Send Message</Button>
+                </Link>
+              </Card.Body>
+            </Card>
+          </div>
+
+          <div className="col-md-4 mb-4">
+            <Card className="shadow-sm">
+              <Card.Body>
+                <Card.Title>Set Availability</Card.Title>
+                <Card.Text>Set your working hours and availability for appointments.</Card.Text>
+                <Link to="/availability">
+                  <Button variant="info" className="w-100">Set Availability</Button>
+                </Link>
               </Card.Body>
             </Card>
           </div>
         </div>
 
-        <Card className="mb-4 shadow-sm">
-          <Card.Body>
-            <Card.Title>Upcoming Appointments</Card.Title>
-            <table className="table">
-              <thead>
-                <tr>
-                  <th>Patient</th>
-                  <th>Date</th>
-                  <th>Status</th>
-                  <th>Actions</th>
-                  <th>Message</th>
-                </tr>
-              </thead>
-              <tbody>
-                {appointments.filter(appt => appt.patientName.toLowerCase().includes(searchTerm)).length > 0 ? (
-                  appointments.filter(appt => appt.patientName.toLowerCase().includes(searchTerm)).map((appointment) => (
-                    <tr key={appointment.id}>
-                      <td>{appointment.patientName}</td>
-                      <td>{new Date(appointment.date).toLocaleString()}</td>
-                      <td>{appointment.status}</td>
-                      <td>
-                        {appointment.status === 'Pending' && (
-                          <>
-                            <button className="btn btn-success me-2" onClick={() => handleApprove(appointment.id)}>Approve</button>
-                            <button className="btn btn-danger" onClick={() => handleReject(appointment.id)}>Reject</button>
-                          </>
-                        )}
-                      </td>
-                      <td>
+        {/* Display Upcoming Appointments */}
+        <h3 className="mt-4">Upcoming Appointments</h3>
+        <div className="row">
+          {appointments.length > 0 ? (
+            appointments.map((appointment) => (
+              <div className="col-md-4 mb-4" key={appointment.id}>
+                <Card className="shadow-sm">
+                  <Card.Body>
+                    <Card.Title>{appointment.patientName}</Card.Title>
+                    <Card.Subtitle className="mb-2 text-muted">
+                      {new Date(appointment.date).toLocaleString()}
+                    </Card.Subtitle>
+                    <Card.Text>Status: {appointment.status}</Card.Text>
+
+                    {appointment.status === 'pending' && (
+                      <div className="d-flex justify-content-between">
+                        <Button variant="success" className="me-2">Approve</Button>
+                        <Button variant="danger">Reject</Button>
+                      </div>
+                    )}
+
+                    <Button
+                      variant="info"
+                      className="mt-2"
+                      data-bs-toggle="modal"
+                      data-bs-target={`#messageModal-${appointment.id}`}
+                    >
+                      Message Patient
+                    </Button>
+                  </Card.Body>
+                </Card>
+
+                {/* Message Modal */}
+                <div
+                  className="modal fade"
+                  id={`messageModal-${appointment.id}`}
+                  tabIndex="-1"
+                  aria-labelledby="messageModalLabel"
+                  aria-hidden="true"
+                >
+                  <div className="modal-dialog">
+                    <div className="modal-content">
+                      <div className="modal-header">
+                        <h5 className="modal-title" id="messageModalLabel">Send Message to {appointment.patientName}</h5>
+                        <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                      </div>
+                      <div className="modal-body">
+                        <textarea
+                          className="form-control"
+                          rows="4"
+                          value={messages[appointment.patientId] || ''}
+                          onChange={(e) => setMessages((prevMessages) => ({
+                            ...prevMessages,
+                            [appointment.patientId]: e.target.value,
+                          }))}
+                          placeholder="Type your message here..."
+                        />
+                      </div>
+                      <div className="modal-footer">
+                        <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                         <button
-                          className="btn btn-info"
-                          data-bs-toggle="modal"
-                          data-bs-target={`#messageModal-${appointment.id}`}
+                          type="button"
+                          className="btn btn-primary"
+                          onClick={() => handleSendMessage(appointment.patientId, `messageModal-${appointment.id}`)}
                         >
-                          Message
+                          Send
                         </button>
-
-                        <div className="modal fade" id={`messageModal-${appointment.id}`} tabIndex="-1">
-                          <div className="modal-dialog">
-                            <div className="modal-content">
-                              <div className="modal-header">
-                                <h5 className="modal-title">Send Message to {appointment.patientName}</h5>
-                                <button type="button" className="btn-close" data-bs-dismiss="modal"></button>
-                              </div>
-                              <div className="modal-body">
-                                <textarea
-                                  className="form-control"
-                                  rows="4"
-                                  value={message}
-                                  onChange={handleMessageChange}
-                                  placeholder="Type your message here..."
-                                />
-                              </div>
-                              <div className="modal-footer">
-                                <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                <button type="button" className="btn btn-primary" onClick={() => handleSendMessage(appointment.patientId)}>
-                                  Send
-                                </button>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </td>
-                    </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td colSpan="5">No appointments available or no match found.</td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </Card.Body>
-        </Card>
-
-        <Card className="shadow-sm">
-          <Card.Body>
-            <Card.Title>Sent Messages</Card.Title>
-            <ul className="list-group">
-              {sentMessages.length > 0 ? (
-                sentMessages.map((msg, index) => (
-                  <li key={index} className="list-group-item">
-                    <strong>To Patient {msg.patientId}:</strong> {msg.content} <br />
-                    <small>{new Date(msg.timestamp).toLocaleString()}</small>
-                  </li>
-                ))
-              ) : (
-                <p>No messages sent yet.</p>
-              )}
-            </ul>
-          </Card.Body>
-        </Card>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))
+          ) : (
+            <p>No upcoming appointments</p>
+          )}
+        </div>
       </div>
     </>
   );
