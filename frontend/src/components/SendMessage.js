@@ -1,10 +1,25 @@
 // src/components/SendMessage.js
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button, Modal, Form } from 'react-bootstrap';
 
-const SendMessage = ({ patientName, patientId, doctorId }) => {
+const SendMessage = ({ patientName, patientId, doctorId, show, onHide }) => {
   const [message, setMessage] = useState('');
   const [showModal, setShowModal] = useState(false);
+
+  // Sync local state with props
+  useEffect(() => {
+    if (show !== undefined) {
+      setShowModal(show);
+    }
+  }, [show]);
+
+  // Handle modal close and notify parent component if onHide is provided
+  const handleClose = () => {
+    setShowModal(false);
+    if (onHide) {
+      onHide();
+    }
+  };
 
   const handleSendMessage = async () => {
     try {
@@ -23,7 +38,7 @@ const SendMessage = ({ patientName, patientId, doctorId }) => {
 
       if (response.ok) {
         setMessage('');
-        setShowModal(false);
+        handleClose();
         alert('Message sent successfully!');
       } else {
         console.error('Failed to send message');
@@ -33,17 +48,21 @@ const SendMessage = ({ patientName, patientId, doctorId }) => {
     }
   };
 
+  // Only render the button if show/onHide props aren't provided
+  // This makes the component work in both standalone and controlled modes
   return (
     <>
-      <Button
-        variant="info"
-        onClick={() => setShowModal(true)}
-      >
-        Message {patientName}
-      </Button>
+      {show === undefined && (
+        <Button
+          variant="info"
+          onClick={() => setShowModal(true)}
+        >
+          Message {patientName}
+        </Button>
+      )}
 
       {/* Modal to send message */}
-      <Modal show={showModal} onHide={() => setShowModal(false)}>
+      <Modal show={showModal} onHide={handleClose}>
         <Modal.Header closeButton>
           <Modal.Title>Send Message to {patientName}</Modal.Title>
         </Modal.Header>
@@ -62,7 +81,7 @@ const SendMessage = ({ patientName, patientId, doctorId }) => {
           </Form>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowModal(false)}>
+          <Button variant="secondary" onClick={handleClose}>
             Close
           </Button>
           <Button variant="primary" onClick={handleSendMessage}>

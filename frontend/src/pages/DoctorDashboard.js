@@ -48,9 +48,18 @@ function DoctorDashboard() {
               <Card.Body>
                 <Card.Title>Send Messages</Card.Title>
                 <Card.Text>Send messages to your patients about appointments.</Card.Text>
-                <Link to="/SendMessage">
-                  <Button variant="secondary" className="w-100">Send Message</Button>
-                </Link>
+                {/* Use Button with onClick instead of Link */}
+                <Button 
+                  variant="secondary" 
+                  className="w-100"
+                  onClick={() => {
+                    // This prevents navigation and does nothing for now
+                    // You might want to add functionality later
+                    alert("Please select a patient from the appointments below to send a message.");
+                  }}
+                >
+                  Send Message
+                </Button>
               </Card.Body>
             </Card>
           </div>
@@ -89,12 +98,14 @@ function DoctorDashboard() {
                       </div>
                     )}
 
-                    {/* Use the SendMessage component to handle sending the message */}
-                    <SendMessage
-                      patientName={appointment.patientName}
-                      patientId={appointment.patientId}
-                      doctorId={user?.id}
-                    />
+                    <div className="mt-3">
+                      {/* Keep SendMessage component as is - it already has its own button and modal */}
+                      <SendMessage
+                        patientName={appointment.patientName}
+                        patientId={appointment.patientId}
+                        doctorId={user?.id}
+                      />
+                    </div>
                   </Card.Body>
                 </Card>
               </div>
