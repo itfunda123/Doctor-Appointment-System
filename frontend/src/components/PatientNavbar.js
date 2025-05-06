@@ -13,7 +13,7 @@ function PatientNavbar() {
   };
 
   return (
-    <Navbar bg="light" expand="lg" className="shadow-sm mb-4">
+    <Navbar bg="dark" variant="dark" expand="lg" className="shadow-sm mb-4">
       <Container>
         <Navbar.Brand as={Link} to="/">Patient Portal</Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
@@ -24,8 +24,8 @@ function PatientNavbar() {
             <Nav.Link as={Link} to="/appointments">My Appointments</Nav.Link>
             <Nav.Link as={Link} to="/notifications">Notifications</Nav.Link>
           </Nav>
-          <span className="me-3">Hello, {user?.name}</span>
-          <Button variant="outline-danger" onClick={handleLogout}>Logout</Button>
+          <span className="me-3 text-white">Hello, {user?.name}</span>
+          <Button variant="outline-light" onClick={handleLogout}>Logout</Button>
         </Navbar.Collapse>
       </Container>
     </Navbar>
