@@ -13,11 +13,24 @@ exports.getAppointments = async (req, res) => {
   try {
     // Fetch appointments and populate patient and doctor details
     const appointments = await Appointment.find()
-      .populate('patientId', 'name')  // Populate only the 'name' field from User (patient)
+    .populate('patientId', '_id name')
       .populate('doctorId', 'name'); // Populate only the 'name' field from User (doctor)
 
     res.json(appointments);
   } catch (err) {
     res.status(500).json({ message: 'Error fetching appointments', error: err.message });
+  }
+};
+
+exports.getAppointmentsByDoctorId = async (req, res) => {
+  try {
+    const { doctorId } = req.params;
+    const appointments = await Appointment.find({ doctorId })
+      .populate('patientId', '_id name')
+      .populate('doctorId', 'name');
+
+    res.json(appointments);
+  } catch (err) {
+    res.status(500).json({ message: 'Error fetching doctor appointments', error: err.message });
   }
 };
