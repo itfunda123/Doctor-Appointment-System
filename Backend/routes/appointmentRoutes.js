@@ -8,7 +8,7 @@ const {
 const router = express.Router();
 
 router.post('/', createAppointment);
+router.get('/doctor/:doctorId', getAppointmentsByDoctorId); // Specific route for doctors
 router.get('/', getAppointments); // Get all appointments
-router.get('/:doctorId', getAppointmentsByDoctorId); // Get appointments by doctor ID
 
 module.exports = router;
