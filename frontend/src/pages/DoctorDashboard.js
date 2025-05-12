@@ -11,7 +11,7 @@ function DoctorDashboard() {
   useEffect(() => {
     const fetchAppointments = async () => {
       try {
-        const response = await fetch(`/api/appointments/doctor/${user?.id}`);
+        const response = await fetch(`/api/appointments/doctor/${user?._id}`);
         const data = await response.json();
         setAppointments(data);
       } catch (error) {
@@ -29,7 +29,6 @@ function DoctorDashboard() {
       <div className="container mt-4">
         <h2 className="mb-4">Welcome, Dr. {user?.name}</h2>
 
-        {/* Action Cards for managing appointments, messaging, and availability */}
         <div className="row">
           <div className="col-md-4 mb-4">
             <Card className="shadow-sm">
@@ -48,15 +47,10 @@ function DoctorDashboard() {
               <Card.Body>
                 <Card.Title>Send Messages</Card.Title>
                 <Card.Text>Send messages to your patients about appointments.</Card.Text>
-                {/* Use Button with onClick instead of Link */}
                 <Button 
                   variant="secondary" 
                   className="w-100"
-                  onClick={() => {
-                    // This prevents navigation and does nothing for now
-                    // You might want to add functionality later
-                    alert("Please select a patient from the appointments below to send a message.");
-                  }}
+                  onClick={() => alert("Please select a patient from the appointments below to send a message.")}
                 >
                   Send Message
                 </Button>
@@ -82,10 +76,10 @@ function DoctorDashboard() {
         <div className="row">
           {appointments.length > 0 ? (
             appointments.map((appointment) => (
-              <div className="col-md-4 mb-4" key={appointment.id}>
+              <div className="col-md-4 mb-4" key={appointment._id}>
                 <Card className="shadow-sm">
                   <Card.Body>
-                    <Card.Title>{appointment.patientName}</Card.Title>
+                    <Card.Title>{appointment.patientId?.name || 'Unnamed Patient'}</Card.Title>
                     <Card.Subtitle className="mb-2 text-muted">
                       {new Date(appointment.date).toLocaleString()}
                     </Card.Subtitle>
@@ -99,11 +93,10 @@ function DoctorDashboard() {
                     )}
 
                     <div className="mt-3">
-                      {/* Keep SendMessage component as is - it already has its own button and modal */}
                       <SendMessage
-                        patientName={appointment.patientName}
-                        patientId={appointment.patientId}
-                        doctorId={user?.id}
+                        patientName={appointment.patientId?.name}
+                        patientId={appointment.patientId?._id}
+                        doctorId={user?._id}
                       />
                     </div>
                   </Card.Body>
