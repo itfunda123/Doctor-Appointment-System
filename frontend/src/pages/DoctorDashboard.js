@@ -9,18 +9,39 @@ function DoctorDashboard() {
   const [appointments, setAppointments] = useState([]);
 
   useEffect(() => {
-    const fetchAppointments = async () => {
-      try {
-        const response = await fetch(`/api/appointments/doctor/${user?._id}`);
-        const data = await response.json();
-        setAppointments(data);
-      } catch (error) {
-        console.error('Error fetching appointments:', error);
-      }
-    };
-
     fetchAppointments();
   }, [user]);
+
+  const fetchAppointments = async () => {
+    try {
+      const response = await fetch(`/api/appointments/doctor/${user?._id}`);
+      const data = await response.json();
+      setAppointments(data);
+    } catch (error) {
+      console.error('Error fetching appointments:', error);
+    }
+  };
+
+  const updateAppointmentStatus = async (appointmentId, status) => {
+    try {
+      const response = await fetch(`/api/appointments/${appointmentId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ status }),
+      });
+
+      if (!response.ok) throw new Error('Failed to update appointment');
+
+      fetchAppointments(); // refresh appointments
+    } catch (error) {
+      console.error('Error updating appointment:', error);
+    }
+  };
+
+  const handleApprove = (id) => updateAppointmentStatus(id, 'approved');
+  const handleReject = (id) => updateAppointmentStatus(id, 'rejected');
 
   return (
     <>
@@ -83,12 +104,12 @@ function DoctorDashboard() {
                     <Card.Subtitle className="mb-2 text-muted">
                       {new Date(appointment.date).toLocaleString()}
                     </Card.Subtitle>
-                    <Card.Text>Status: {appointment.status}</Card.Text>
+                    <Card.Text>Status: <strong>{appointment.status}</strong></Card.Text>
 
                     {appointment.status === 'pending' && (
                       <div className="d-flex justify-content-between">
-                        <Button variant="success" className="me-2">Approve</Button>
-                        <Button variant="danger">Reject</Button>
+                        <Button variant="success" className="me-2" onClick={() => handleApprove(appointment._id)}>Approve</Button>
+                        <Button variant="danger" onClick={() => handleReject(appointment._id)}>Reject</Button>
                       </div>
                     )}
 
