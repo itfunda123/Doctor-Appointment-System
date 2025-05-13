@@ -14,17 +14,25 @@ function ViewAppointments() {
       return;
     }
 
-    axios.get('http://localhost:5000/api/appointments')
-      .then((res) => {
-        const userAppointments = res.data.filter(
-          (appt) => appt.patientId._id === user._id
-        );
-        setAppointments(userAppointments);
-      })
-      .catch((err) => {
-        console.error(err);
-        alert('Failed to fetch appointments');
-      });
+    const fetchAppointments = () => {
+      axios.get('http://localhost:5000/api/appointments')
+        .then((res) => {
+          const userAppointments = res.data.filter(
+            (appt) => appt.patientId._id === user._id
+          );
+          setAppointments(userAppointments);
+        })
+        .catch((err) => {
+          console.error(err);
+          alert('Failed to fetch appointments');
+        });
+    };
+
+    fetchAppointments(); // Fetch initially
+
+    const interval = setInterval(fetchAppointments, 5000); // Refresh every 5 seconds
+
+    return () => clearInterval(interval); // Cleanup on unmount
   }, [user, navigate]);
 
   return (
