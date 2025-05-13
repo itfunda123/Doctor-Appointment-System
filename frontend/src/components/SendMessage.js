@@ -1,96 +1,53 @@
-// src/components/SendMessage.js
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Button, Modal, Form } from 'react-bootstrap';
 
-const SendMessage = ({ patientName, patientId, doctorId, show, onHide }) => {
-  const [message, setMessage] = useState('');
-  const [showModal, setShowModal] = useState(false);
+function SendMessage({ patientId, doctorId, patientName }) {
+  const [show, setShow] = useState(false);
+  const [content, setContent] = useState('');
 
-  // Sync local state with props
-  useEffect(() => {
-    if (show !== undefined) {
-      setShowModal(show);
-    }
-  }, [show]);
-
-  // Handle modal close and notify parent component if onHide is provided
-  const handleClose = () => {
-    setShowModal(false);
-    if (onHide) {
-      onHide();
-    }
-  };
-
-  const handleSendMessage = async () => {
+  const handleSend = async () => {
     try {
-      const newMessage = {
-        patientId,
-        doctorId,
-        content: message,
-        timestamp: new Date(),
-      };
-
-      const response = await fetch(`/api/messages/send`, {
+      const response = await fetch('/api/messages', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newMessage),
+        body: JSON.stringify({ doctorId, patientId, content }),
       });
 
-      if (response.ok) {
-        setMessage('');
-        handleClose();
-        alert('Message sent successfully!');
-      } else {
-        console.error('Failed to send message');
-      }
-    } catch (error) {
-      console.error('Error sending message:', error);
+      if (!response.ok) throw new Error('Failed to send message');
+      alert('Message sent successfully');
+      setContent('');
+      setShow(false);
+    } catch (err) {
+      alert('Error sending message');
     }
   };
 
-  // Only render the button if show/onHide props aren't provided
-  // This makes the component work in both standalone and controlled modes
   return (
     <>
-      {show === undefined && (
-        <Button
-          variant="info"
-          onClick={() => setShowModal(true)}
-        >
-          Message {patientName}
-        </Button>
-      )}
+      <Button variant="outline-primary" onClick={() => setShow(true)}>
+        Message
+      </Button>
 
-      {/* Modal to send message */}
-      <Modal show={showModal} onHide={handleClose}>
+      <Modal show={show} onHide={() => setShow(false)}>
         <Modal.Header closeButton>
           <Modal.Title>Send Message to {patientName}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <Form>
-            <Form.Group controlId="message">
-              <Form.Label>Message</Form.Label>
-              <Form.Control
-                as="textarea"
-                rows={4}
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-                placeholder="Type your message here..."
-              />
-            </Form.Group>
-          </Form>
+          <Form.Control
+            as="textarea"
+            rows={3}
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+            placeholder="Type your message..."
+          />
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={handleClose}>
-            Close
-          </Button>
-          <Button variant="primary" onClick={handleSendMessage}>
-            Send
-          </Button>
+          <Button variant="secondary" onClick={() => setShow(false)}>Close</Button>
+          <Button variant="primary" onClick={handleSend}>Send</Button>
         </Modal.Footer>
       </Modal>
     </>
   );
-};
+}
 
 export default SendMessage;
