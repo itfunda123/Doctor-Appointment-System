@@ -15,6 +15,8 @@ function DoctorDashboard() {
       const response = await fetch(`/api/appointments/doctor/${user._id}`);
       if (!response.ok) throw new Error('Failed to fetch appointments');
       const data = await response.json();
+
+      console.log('Fetched appointments:', data); // 👈 Debug line added
       setAppointments(data);
     } catch (error) {
       console.error('Error fetching appointments:', error);
