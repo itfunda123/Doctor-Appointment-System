@@ -1,18 +1,13 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import DoctorNavbar from '../components/DoctorNavbar';
 import { Card, Button } from 'react-bootstrap';
-import { Link } from 'react-router-dom';
 import SendMessage from '../components/SendMessage';
 
 function DoctorDashboard() {
   const user = JSON.parse(localStorage.getItem('user'));
   const [appointments, setAppointments] = useState([]);
 
-  useEffect(() => {
-    fetchAppointments();
-  }, [user]);
-
-  const fetchAppointments = async () => {
+  const fetchAppointments = useCallback(async () => {
     try {
       const response = await fetch(`/api/appointments/doctor/${user?._id}`);
       const data = await response.json();
@@ -20,28 +15,13 @@ function DoctorDashboard() {
     } catch (error) {
       console.error('Error fetching appointments:', error);
     }
-  };
+  }, [user]);
 
-  const updateAppointmentStatus = async (appointmentId, status) => {
-    try {
-      const response = await fetch(`/api/appointments/${appointmentId}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ status }),
-      });
-
-      if (!response.ok) throw new Error('Failed to update appointment');
-
-      fetchAppointments(); // refresh appointments
-    } catch (error) {
-      console.error('Error updating appointment:', error);
+  useEffect(() => {
+    if (user?._id) {
+      fetchAppointments();
     }
-  };
-
-  const handleApprove = (id) => updateAppointmentStatus(id, 'approved');
-  const handleReject = (id) => updateAppointmentStatus(id, 'rejected');
+  }, [user, fetchAppointments]);
 
   return (
     <>
@@ -51,27 +31,37 @@ function DoctorDashboard() {
         <h2 className="mb-4">Welcome, Dr. {user?.name}</h2>
 
         <div className="row">
+          {/* Manage Appointments Card */}
           <div className="col-md-4 mb-4">
             <Card className="shadow-sm">
               <Card.Body>
                 <Card.Title>Manage Appointments</Card.Title>
-                <Card.Text>View, approve, or reject patient appointments.</Card.Text>
-                <Link to="/appointments">
-                  <Button variant="primary" className="w-100">View Appointments</Button>
-                </Link>
+                <Card.Text>View, approve, or reject patient appointments below.</Card.Text>
+                <Button
+                  variant="primary"
+                  className="w-100"
+                  onClick={fetchAppointments}
+                >
+                  Refresh Appointments
+                </Button>
               </Card.Body>
             </Card>
           </div>
 
+          {/* Send Message Info Card */}
           <div className="col-md-4 mb-4">
             <Card className="shadow-sm">
               <Card.Body>
                 <Card.Title>Send Messages</Card.Title>
                 <Card.Text>Send messages to your patients about appointments.</Card.Text>
-                <Button 
-                  variant="secondary" 
+                <Button
+                  variant="secondary"
                   className="w-100"
-                  onClick={() => alert("Please select a patient from the appointments below to send a message.")}
+                  onClick={() =>
+                    alert(
+                      'Please select a patient from the appointments below to send a message.'
+                    )
+                  }
                 >
                   Send Message
                 </Button>
@@ -79,14 +69,21 @@ function DoctorDashboard() {
             </Card>
           </div>
 
+          {/* Set Availability Card */}
           <div className="col-md-4 mb-4">
             <Card className="shadow-sm">
               <Card.Body>
                 <Card.Title>Set Availability</Card.Title>
-                <Card.Text>Set your working hours and availability for appointments.</Card.Text>
-                <Link to="/availability">
-                  <Button variant="info" className="w-100">Set Availability</Button>
-                </Link>
+                <Card.Text>
+                  Set your working hours and availability for appointments.
+                </Card.Text>
+                <Button
+                  variant="info"
+                  className="w-100"
+                  href="/availability"
+                >
+                  Set Availability
+                </Button>
               </Card.Body>
             </Card>
           </div>
@@ -104,12 +101,12 @@ function DoctorDashboard() {
                     <Card.Subtitle className="mb-2 text-muted">
                       {new Date(appointment.date).toLocaleString()}
                     </Card.Subtitle>
-                    <Card.Text>Status: <strong>{appointment.status}</strong></Card.Text>
+                    <Card.Text>Status: {appointment.status}</Card.Text>
 
                     {appointment.status === 'pending' && (
                       <div className="d-flex justify-content-between">
-                        <Button variant="success" className="me-2" onClick={() => handleApprove(appointment._id)}>Approve</Button>
-                        <Button variant="danger" onClick={() => handleReject(appointment._id)}>Reject</Button>
+                        <Button variant="success" className="me-2">Approve</Button>
+                        <Button variant="danger">Reject</Button>
                       </div>
                     )}
 
