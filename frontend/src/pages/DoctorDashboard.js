@@ -8,6 +8,7 @@ function DoctorDashboard() {
   const user = JSON.parse(localStorage.getItem('user'));
   const [appointments, setAppointments] = useState([]);
 
+  // Fetch appointments from backend
   const fetchAppointments = async () => {
     if (!user?._id) return;
 
@@ -15,8 +16,7 @@ function DoctorDashboard() {
       const response = await fetch(`/api/appointments/doctor/${user._id}`);
       if (!response.ok) throw new Error('Failed to fetch appointments');
       const data = await response.json();
-
-      console.log('Fetched appointments:', data); // 👈 Debug line added
+      console.log('Fetched appointments:', data);
       setAppointments(data);
     } catch (error) {
       console.error('Error fetching appointments:', error);
@@ -26,6 +26,28 @@ function DoctorDashboard() {
   useEffect(() => {
     fetchAppointments();
   }, [user]);
+
+  // Handle status update (approve/reject)
+  const handleStatusChange = async (appointmentId, newStatus) => {
+    try {
+      const response = await fetch(`/api/appointments/${appointmentId}/status`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ status: newStatus }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update status');
+      }
+
+      await fetchAppointments(); // Refresh appointments
+    } catch (err) {
+      console.error(err);
+      alert('Could not update appointment status');
+    }
+  };
 
   return (
     <>
@@ -91,8 +113,19 @@ function DoctorDashboard() {
 
                     {appointment.status === 'pending' && (
                       <div className="d-flex justify-content-between mb-3">
-                        <Button variant="success" className="me-2">Approve</Button>
-                        <Button variant="danger">Reject</Button>
+                        <Button
+                          variant="success"
+                          className="me-2"
+                          onClick={() => handleStatusChange(appointment._id, 'approved')}
+                        >
+                          Approve
+                        </Button>
+                        <Button
+                          variant="danger"
+                          onClick={() => handleStatusChange(appointment._id, 'rejected')}
+                        >
+                          Reject
+                        </Button>
                       </div>
                     )}
 

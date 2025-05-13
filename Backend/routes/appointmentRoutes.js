@@ -8,9 +8,16 @@ const {
 
 const router = express.Router();
 
+// Create a new appointment
 router.post('/', createAppointment);
-router.get('/doctor/:doctorId', getAppointmentsByDoctorId);
+
+// Get all appointments
 router.get('/', getAppointments);
-router.put('/:id', updateAppointmentStatus); // ✅ Added this line
+
+// Get appointments by specific doctor ID
+router.get('/doctor/:doctorId', getAppointmentsByDoctorId);
+
+// ✅ Corrected path: Update appointment status (approve/reject)
+router.put('/:id/status', updateAppointmentStatus);
 
 module.exports = router;
