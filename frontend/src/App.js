@@ -9,6 +9,7 @@ import BookAppointment from './pages/BookAppointment';
 import ViewAppointments from './pages/ViewAppointments';
 import DoctorDashboard from './pages/DoctorDashboard';
 import PatientDashboard from './components/PatientDashboard';
+import Notifications from './pages/Notifications'; // ✅ Import Notifications
 
 function AppWrapper() {
   const location = useLocation();
@@ -29,6 +30,7 @@ function AppWrapper() {
           <Route path="/appointments" element={<ViewAppointments />} />
           <Route path="/doctor-dashboard" element={<DoctorDashboard />} />
           <Route path="/patient-dashboard" element={<PatientDashboard />} />
+          <Route path="/notifications" element={<Notifications />} /> {/* ✅ New Route */}
         </Routes>
       </div>
 
