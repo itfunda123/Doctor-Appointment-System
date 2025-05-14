@@ -19,10 +19,10 @@ exports.getMessagesForPatient = async (req, res) => {
 
     const messages = await Message.find({ patientId })
       .sort({ timestamp: -1 })
-      .populate('doctorId', 'name');
+      .populate('doctorId', 'name'); // 👈 This adds doctor name to each message
 
-    res.json(messages);
+    res.status(200).json(messages);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ error: 'Failed to fetch messages' });
   }
 };

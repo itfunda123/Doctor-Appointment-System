@@ -18,6 +18,7 @@ function SendMessage({ patientId, doctorId, patientName }) {
       setContent('');
       setShow(false);
     } catch (err) {
+      console.error('Error sending message:', err);
       alert('Error sending message');
     }
   };
