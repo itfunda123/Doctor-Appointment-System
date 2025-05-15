@@ -9,7 +9,10 @@ import BookAppointment from './pages/BookAppointment';
 import ViewAppointments from './pages/ViewAppointments';
 import DoctorDashboard from './pages/DoctorDashboard';
 import PatientDashboard from './components/PatientDashboard';
-import Notifications from './pages/Notifications'; // ✅ Import Notifications
+import Notifications from './pages/Notifications';
+
+// ✅ Import SetAvailability
+import SetAvailability from './components/SetAvailability';
 
 function AppWrapper() {
   const location = useLocation();
@@ -30,7 +33,10 @@ function AppWrapper() {
           <Route path="/appointments" element={<ViewAppointments />} />
           <Route path="/doctor-dashboard" element={<DoctorDashboard />} />
           <Route path="/patient-dashboard" element={<PatientDashboard />} />
-          <Route path="/notifications" element={<Notifications />} /> {/* ✅ New Route */}
+          <Route path="/notifications" element={<Notifications />} />
+          
+          {/* ✅ Add the route for SetAvailability */}
+          <Route path="/availability" element={<SetAvailability />} />
         </Routes>
       </div>
 
